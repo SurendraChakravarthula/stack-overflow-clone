@@ -132,7 +132,7 @@
                                     </a>
                                 </div>
                                 <div class="edit">
-                                    <a th:href="@{/questionEdit/{id}(id= ${question.id})}">Edit</a>
+                                    <a th:href="@{/questions/{id}/edit(id=${question.id})}" th:if="${#authorization.expression('isAnonymous()') or question.checkQuestionEditor}">Edit</a>
                                 </div>
                                 <div id="askedBy">
                                     <code th:text="${#temporals.format(question.createdAt,'MMM dd, yyyy')}"></code>
@@ -188,7 +188,7 @@
                                 <div class="answer-comment-container">
                                     <p th:utext="${answer.answer}"></p>
                                     <div class="edit">
-                                        <a th:href="@{/question/{questionId}/answer/{answerId}(questionId= ${question.id},answerId= ${answer.answerId})}">Edit</a>
+                                        <a th:href="@{/question/{questionId}/answer/{answerId}(questionId= ${question.id},answerId= ${answer.answerId})}"  th:if="${#authorization.expression('isAnonymous()') or answer.user.email eq question.email}">Edit</a>
                                     </div>
                                     <div id="commentss" th:each="comment : ${answer.comments}">
                                         <hr>
@@ -238,7 +238,6 @@
                     <form th:action="@{/questions/{questionId}/addAnswer(questionId=${question.id})}" method="post">
                         <textarea placeholder="add answer" id="addAnswer" name="answer"></textarea>
                         <br>
-                        <input type="hidden" name="answerId" th:value="${answerId}">
                         <button type="submit">Add Answer</button>
                     </form>
                 </div>

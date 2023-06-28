@@ -25,6 +25,8 @@ public class QuestionDto {
     private List<Question> relatedQue;
     private String totalTags;
     private String username;
+    private String email;
+    private boolean checkQuestionEditor;
     private boolean showVoteUp = true;
     private boolean showVoteDown = true;
 }

@@ -21,13 +21,19 @@ public class UserController {
     }
 
     @GetMapping("/signup")
-    public String signup() {
+    public String signup(Model model) {
         return "signup";
     }
 
     @PostMapping("/signup")
-    public String addUser(@ModelAttribute User user) {
-        userService.addUser(user);
+    public String addUser(@ModelAttribute User user,
+                          Model model) {
+        try {
+            userService.addUser(user);
+        } catch (Exception e) {
+            model.addAttribute("exists", "An account for that email already exists");
+            return "signup";
+        }
         return "login";
     }
 
@@ -39,5 +45,4 @@ public class UserController {
         model.addAttribute("users", userService.getAllUsers(search, sortBy, page));
         return "user";
     }
-
 }

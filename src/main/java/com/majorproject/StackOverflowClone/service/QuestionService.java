@@ -25,10 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 
@@ -58,6 +55,9 @@ public class QuestionService {
     }
 
     public Long addQuestion(QuestionDto questionDto) {
+        if (questionRepository.findByTitle(questionDto.getTitle()) != null) {
+            throw new RuntimeException();
+        }
         if (questionDto.getTotalTags() == null) {
             return questionRepository.save(convertDtoToDao(questionDto)).getQuestionId();
         }
@@ -88,6 +88,9 @@ public class QuestionService {
         questionDto.setSortBy(sortBy);
         questionDto.setRelatedQue(getRelatedQuestions(question));
         questionDto.setUsername(question.getUser().getUsername());
+        questionDto.setCheckQuestionEditor(checkQuestionEditor(id));
+        if(getUser()!=null)
+        questionDto.setEmail(getUser().getEmail());
         return setVotedUpAndDown(questionDto);
     }
 
@@ -269,5 +272,16 @@ public class QuestionService {
         question.setTags(setOfTags);
         tagRepository.deleteUnusedTags();
         return questionRepository.save(question).getQuestionId();
+    }
+
+    public boolean checkQuestionEditor(long id) {
+        try {
+            Question question = questionRepository.findById(id).orElse(null);
+            if (question == null)
+                return true;
+            return Objects.requireNonNull(userRepository.findByEmail(getUser().getEmail()).orElse(null)).getQuestions().contains(question);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
